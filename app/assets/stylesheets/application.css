@@ -74,17 +74,3 @@ a {
   margin: 0;
 }
 
-.changes_text {
-  display: none;
-}
-
-.text {
- width: 140px;
- min-height: 17px;
-}
-
-div.text {
-  padding: 4px;
-  overflow: auto;
-}
-

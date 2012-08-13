@@ -1,11 +1,18 @@
-<%= javascript_include_tag :table %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag :table %>
+  <%= javascript_include_tag :table %>
+<% end %>
+
 
 <table border="1">
 <% @rows.times do |r| %>
   <tr>
   <% @columns.times do |c| %>
      <td>
-       <div class="text"></div>
+       <div class="highlight-pane">
+        <div class="highlight search-highlight" style="left: 2px; top: 2px; width: 41px; height: 17px;"></div>
+       </div>
+       <div id="text_r<%=r%>c<%=c%>" class="text"></div>       
        <input id="r<%=r%>c<%=c%>" class="text changes_text" name="r<%=r%>c<%=c%>" type="text">
      </td>
   <% end %>

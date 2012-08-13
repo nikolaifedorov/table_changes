@@ -5,16 +5,16 @@ $(function() {
   //if ($("#comments").length > 0) {
   //  setTimeout(updateComments, 10000);
   //}
-  
-    
-  $("#container td").bind('click', function() {
-    var div = $(this).find("div");
-    var input = $(this).find("input");
+
+  $("#container td div.text").bind('click', function() {
+    var div = $(this);    
+    var input = $(div).parent().find("input");
     var val_div_input = $(div).text();
     $(div).hide();
     $(input).val(val_div_input);
     $(input).show();
     $(input).focus();
+    
     var key_press = 0;
     $(input).bind("keydown", function (event) {
       key_press = key_press + 1;
@@ -22,8 +22,7 @@ $(function() {
         key_press = 0;
       }
     });
-    
-    
+        
     $(input).bind('focusout', function() {
       var val_input_div = $(this).val();
       $(this).hide();
@@ -32,7 +31,8 @@ $(function() {
     });
     
     
-  });
+  }); 
+ 
     
 });
 

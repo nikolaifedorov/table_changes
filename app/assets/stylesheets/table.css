@@ -2,3 +2,37 @@
   Place all the styles related to the matching controller here.
   They will automatically be included in application.css.
 */
+
+.highlight-pane {
+  position: relative;
+}
+
+.search-highlight {
+  opacity: 0.50;
+  -moz-opacity: 0.50;
+  -khtml-opacity: 0.50;
+  filter: alpha(opacity=50);
+  background-color: #FF6;
+}
+
+.highlight {
+  position: absolute;
+  font-size: 0;
+  line-height: 0;
+  cursor: text;
+  border-style: none;
+}
+
+.changes_text {
+  display: none;
+}
+
+.text {
+ width: 140px;
+ min-height: 17px;
+}
+
+div.text {
+  padding: 4px;
+  overflow: auto;
+}
