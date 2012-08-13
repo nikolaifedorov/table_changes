@@ -7,7 +7,7 @@ class CellController < ApplicationController
     @updated_at = cell_texts.map(&:updated_at).max
   end
   
-  def update_text
+  def change
     cell = params['cell']
     index = cell[:id]
     text = cell[:text]

@@ -7,41 +7,51 @@ $(function() {
 
   var old_text = "";
   var new_text = "";
-  var key_press = 0;
+  var count_changes = 0;
+  var timeout_id_wait_changes; 
 
-  $("#container td input.text").bind("keydown", function (event) {
-   key_press = key_press + 1;
-   var index_start = $(this).caret().start
-   if (key_press >= 3) {
-    key_press = 0;
-    
-   }
+
+  $("#container td input.text").bind("keyup", function (event) {
+    var that = this;  
+  
+    if (timeout_id_wait_changes) {
+      clearTimeout(timeout_id_wait_changes);
+    }
+    timeout_id_wait_changes = setTimeout(function() { changesText(that); }, 8000);
+
+    count_changes = count_changes + 1;
+    //var index_start = $(that).caret().start
+    if (count_changes >= 3) {
+      changesText(that);
+    }
   }); 
 
   $("#container td input.text").bind('focusin', function() {
     old_text = $(this).val();
-    key_press = 0;
+    count_changes = 0;
   });
 
   $("#container td input.text").bind('focusout', function() {
-    new_text = $(this).val();
-    key_press = 0;
+    var that = this;    
+    new_text = $(that).val();
+    count_changes = 0;
     if( old_text != new_text) {
-      changesText($(this));
+      changesText(that);
     }
   });
  
     
 });
 
-function changesText (that) {
+function changesText (that) { 
+  count_changes = 0;
   var index = $(that).attr('id');
-  var text = $.param(that);
+  var param_text = $.param($(that));
 
   $.ajax({
     url: sChangesTextAjaxUrl,
     type: "post",
-    data: "cell[id]=" + index + "&" + text
+    data: "cell[id]=" + index + "&" + param_text
   });
 }
 

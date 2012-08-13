@@ -59,6 +59,6 @@ TableChangesRt::Application.routes.draw do
   resources :table 
 
   resources :cell
-  post "cell/update_text"
+  post "cell/change"
 
 end
