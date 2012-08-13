@@ -1,0 +1,7 @@
+<% unless @cells.empty? %>
+  <% @cells.each do |cell| %>
+    <% text = @cell_index[cell][0].text %>
+    $("input#<%=cell%>").val("<%=raw escape_javascript(text) %>");
+  <% end %>
+  $("table").attr("data-time", "<%= @updated_at.to_i %>");
+<% end %>

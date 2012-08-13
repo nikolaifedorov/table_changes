@@ -3,9 +3,7 @@
 
 $(function() {
 
-  //if ($("#comments").length > 0) {
-  //  setTimeout(updateComments, 10000);
-  //}
+  setTimeout(updateText, 10000);
 
   var old_text = "";
   var new_text = "";
@@ -29,19 +27,26 @@ $(function() {
     new_text = $(this).val();
     key_press = 0;
     if( old_text != new_text) {
-      updateText($(this));
+      changesText($(this));
     }
   });
  
     
 });
 
-function updateText (that) {
+function changesText (that) {
   var index = $(that).attr('id');
   var text = $.param(that);
+
   $.ajax({
-    url: "cell/update_text",
+    url: sChangesTextAjaxUrl,
     type: "post",
     data: "cell[id]=" + index + "&" + text
   });
+}
+
+function updateText () {
+  var after = $("table").attr("data-time");
+  $.getScript(sUpdateTextAjaxUrl +"?after=" + after);
+  setTimeout(updateText, 10000);
 }
