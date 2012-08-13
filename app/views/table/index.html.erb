@@ -1,5 +1,6 @@
 <% content_for :head do %>
   <%= stylesheet_link_tag :table %>
+  <%= javascript_include_tag 'jquery.caret.1.02' %>
   <%= javascript_include_tag :table %>
 <% end %>
 
@@ -12,8 +13,10 @@
        <div class="highlight-pane">
         <div class="highlight search-highlight" style="left: 2px; top: 2px; width: 41px; height: 17px;"></div>
        </div>
-       <div id="text_r<%=r%>c<%=c%>" class="text"></div>       
-       <input id="r<%=r%>c<%=c%>" class="text changes_text" name="r<%=r%>c<%=c%>" type="text">
+       <% current_index = "r#{r}c#{c}" %>
+       <% text = @cell_index[current_index].nil? ? nil : 
+                                                   @cell_index[current_index][0].text %>
+       <%= text_field_tag "cell[text]", text, id: "r#{r}c#{c}", class: "text" %>       
      </td>
   <% end %>
   </tr>

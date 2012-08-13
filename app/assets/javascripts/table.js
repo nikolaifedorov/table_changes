@@ -2,47 +2,46 @@
 // All this logic will automatically be available in application.js.
 
 $(function() {
+
   //if ($("#comments").length > 0) {
   //  setTimeout(updateComments, 10000);
   //}
 
-  $("#container td div.text").bind('click', function() {
-    var div = $(this);    
-    var input = $(div).parent().find("input");
-    var val_div_input = $(div).text();
-    $(div).hide();
-    $(input).val(val_div_input);
-    $(input).show();
-    $(input).focus();
+  var old_text = "";
+  var new_text = "";
+  var key_press = 0;
+
+  $("#container td input.text").bind("keydown", function (event) {
+   key_press = key_press + 1;
+   var index_start = $(this).caret().start
+   if (key_press >= 3) {
+    key_press = 0;
     
-    var key_press = 0;
-    $(input).bind("keydown", function (event) {
-      key_press = key_press + 1;
-      if (key_press == 3) {
-        key_press = 0;
-      }
-    });
-        
-    $(input).bind('focusout', function() {
-      var val_input_div = $(this).val();
-      $(this).hide();
-      $(div).text(val_input_div);
-      $(div).show();
-    });
-    
-    
+   }
   }); 
+
+  $("#container td input.text").bind('focusin', function() {
+    old_text = $(this).val();
+    key_press = 0;
+  });
+
+  $("#container td input.text").bind('focusout', function() {
+    new_text = $(this).val();
+    key_press = 0;
+    if( old_text != new_text) {
+      updateText($(this));
+    }
+  });
  
     
 });
 
-function updateComments () {
-  var article_id = $("#article").attr("data-id");
-  if ($(".comment").length > 0) {
-    var after = $(".comment:last-child").attr("data-time");
-  } else {
-    var after = "0";
-  }
-  $.getScript("/comments.js?article_id=" + article_id + "&after=" + after)
-  setTimeout(updateComments, 10000);
+function updateText (that) {
+  var index = $(that).attr('id');
+  var text = $.param(that);
+  $.ajax({
+    url: "cell/update_text",
+    type: "post",
+    data: "cell[id]=" + index + "&" + text
+  });
 }
