@@ -1,0 +1,14 @@
+<%= javascript_include_tag :table %>
+
+<table border="1">
+<% @rows.times do |r| %>
+  <tr>
+  <% @columns.times do |c| %>
+     <td>
+       <div class="text"></div>
+       <input id="r<%=r%>c<%=c%>" class="text changes_text" name="r<%=r%>c<%=c%>" type="text">
+     </td>
+  <% end %>
+  </tr>
+<% end %>
+</table> 
