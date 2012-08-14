@@ -1,7 +1,16 @@
 <% unless @cells.empty? %>
   <% @cells.each do |cell| %>
-    <% text = @cell_index[cell][0].text %>
+    <% text = get_text_by_index(@cell_index, cell)%>
     $("input#<%=cell%>").val("<%=raw escape_javascript(text) %>");
+    <% get_text_histories(@cell_index, cell, @history_time_i).each do |edit| %>
+      $("input#<%=cell%>").parent().find("div.highlight-pane").
+        append("<%= raw escape_javascript(highlight_div(edit)) %>");
+    <% end %>
+    $("input#<%=cell%>").parent().find("div.highlight-pane > div").
+      delay(6000).
+      hide(5000, function() {
+        $(this).remove();
+      });
   <% end %>
   $("table").attr("data-time", "<%= @updated_at.to_i %>");
 <% end %>

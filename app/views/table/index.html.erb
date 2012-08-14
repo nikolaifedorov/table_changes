@@ -15,14 +15,14 @@
     <% @columns.times do |c| %>
        <td>
          <div class="highlight-pane">
-          <div class="highlight search-highlight" style="left: 2px; top: 2px; width: 41px; height: 17px;"></div>
          </div>
          <% current_index = "r#{r}c#{c}" %>
          <% text = @cell_index[current_index].nil? ? 
                      nil : 
                      @cell_index[current_index][0].text %>
          <%= text_field_tag "cell[text]", text, 
-                            id: "r#{r}c#{c}", class: "text" %>       
+                            id: "r#{r}c#{c}", class: "text",
+                            maxlength: 12 %>       
        </td>
     <% end %>
     </tr>
