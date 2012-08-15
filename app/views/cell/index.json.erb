@@ -1,0 +1,6 @@
+<% unless @cells.empty? %>
+{
+  "data-time": "<%= @updated_at.to_i %>",
+  "data": <%= raw changes_json(@cells, @cell_index, @history_time_i) %>
+}
+<% end %>

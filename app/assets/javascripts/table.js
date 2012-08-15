@@ -3,7 +3,7 @@
 
 $(function() {
 
-  //setTimeout(updateText, 5000);
+  setTimeout(updateText, 5000);
 
   var count_changes = 0;
   var timeout_id_wait_changes; 
@@ -16,17 +16,21 @@ $(function() {
       var metaData = new MetaData(that);
       metaData.setNewText();  
 
-      if (timeout_id_wait_changes) {
-        clearTimeout(timeout_id_wait_changes);
-      }
+      $(that).parent().find('div.highlight-pane > div').remove();
+
+      cancelTimer();
       timeout_id_wait_changes = setTimeout(function() { changesText(that); }, 500);
+
+      if(metaData.getNewText() == metaData.getOldText()) {
+        cancelTimer();  
+      }
 
       var code = event.keyCode ? event.keyCode : event.charCode;
       
-      var del_code = [8, 37]
-      var arrow_code = [38, 39, 40, 46];
+      var del_code = [8, 46];
+      var arrow_code = [37, 38, 39, 40];
 
-      if ($.inArray(code, $.merge([], del_code)) > -1 )  {
+      if ($.inArray(code, $.merge(del_code, arrow_code)) > -1 )  {
         metaData.setStartCursor();
         metaData.setEndCursor();
       }
@@ -39,11 +43,13 @@ $(function() {
 
       if ($.inArray(code, arrow_code) == -1) {
         metaData.setEndCursor();
-        count_changes = count_changes + 1;
+
+        if(metaData.getNewText() != metaData.getOldText()) {
+          count_changes = count_changes + 1;
+        }
 
         if (count_changes >= 3) {
           changesText(that);
-          metaData.setStartCursor();
         }
       } 
 
@@ -68,7 +74,8 @@ $(function() {
     change: function() {
       var that = this;
       var metaData = new MetaData(that);
-      metaData.setNewText(); 
+      metaData.setNewText();
+      metaData.setStartCursor();
 
       count_changes = 0;
       changesText(that);
@@ -82,71 +89,62 @@ $(function() {
  
   });
 
-function changesText (that) { 
-  if (timeout_id_wait_changes) {
-    clearTimeout(timeout_id_wait_changes);
+  function cancelTimer(timeout_id) {
+    var timer_id = timeout_id || timeout_id_wait_changes
+    if (timer_id) {
+      clearTimeout(timer_id);
+    }
   }
-  count_changes = 0;
-  var cell_index = $(that).attr('id');
-  var param_text = $.param($(that));
-  var after = $("table").attr("data-time");
 
-  var metaData = new MetaData(that);
-  var index_start = metaData.getStartCursor(); 
-  var index_end = metaData.getEndCursor();
+  function changesText (that) { 
+    cancelTimer();
+    count_changes = 0;
+    var cell_index = $(that).attr('id');
+    var param_text = $.param($(that));
+    var after = $("table").attr("data-time");
 
-  $.ajax({
-    url: sChangesTextAjaxUrl,
-    type: "post",
-    data: "cell[id]=" + cell_index + "&" + param_text + "&history[start]=" + index_start + "&history[end]=" + index_end + "&syn=" + after
-  });
-}
+    var metaData = new MetaData(that);
+    var index_start = metaData.getStartCursor(); 
+    var index_end = metaData.getEndCursor();
+    
+    if(metaData.getNewText() != metaData.getOldText()) {
+      $.ajax({
+        url: sChangesTextAjaxUrl,
+        type: "post",
+        data: "cell[id]=" + cell_index + "&" + param_text + "&history[start]=" + index_start + "&history[end]=" + index_end + "&syn=" + after
+      });
+    }
+    metaData.setStartCursor();
+  }
 
-function updateText () {
-  var after = $("table").attr("data-time");
-  $.getScript(sUpdateTextAjaxUrl +"?after=" + after);
-  //setTimeout(updateText, 5000);
-}
+  function updateText () {
+    var after = $("table").attr("data-time");
+    //$.getScript(sUpdateTextAjaxUrl +"?after=" + after);
+    $.getJSON(sUpdateTextJsonUrl, "after=" + after, function(data) {
+      if (data) {      
+        var letter = 8, top = 6, left_const = 3, height = 14;
+        $("table").attr("data-time", data['data-time']);
+        $.each(data.data, function(index, rows) {
+          $.each(rows['changes'], function(index, change) {
+            var div_element = $("<div class='highlight search-highlight'>");
+            var start_cursor = parseInt(change['start_cursor']);
+            var end_cursor = parseInt(change['end_cursor']); 
+            var d_l = start_cursor * letter + left_const;
+            var d_w = (end_cursor - start_cursor) * letter;       
+            div_element.css('left', d_l + 'px');
+            div_element.css('top', top + 'px');
+            div_element.css('width', d_w + 'px');
+            div_element.css('height', height + 'px');
+            div_element.delay(2000).hide(0, function() { $(this).remove(); });
+            $("input#" + rows['name']).parent().
+              find("div.highlight-pane").append(div_element);
+          });
+        });
+      }
+    });
+    setTimeout(updateText, 5000);
+  }
    
 });
 
-function MetaData(that) {
-  this.that = that;
-  this.meta_new_text = 'new_text';
-  this.meta_old_text = 'old_text';
-  this.meta_start_cursor = 'start_cursor';
-  this.meta_end_cursor = 'end_cursor';  
-
-  this.setNewText = function() {
-    $(this.that).data(this.meta_new_text, $(this.that).val());
-  }
-  
-  this.getNewText = function() {
-    return $(this.that).data(this.meta_new_text);
-  }
-
-  this.setOldText = function() {
-    $(this.that).data(this.meta_old_text, $(this.that).val());
-  }
-  
-  this.getOldText = function() {
-    return $(this.that).data(this.meta_old_text);
-  }
-
-  this.setStartCursor = function() {
-    $(this.that).data(this.meta_start_cursor, $(this.that).caret().start);
-  }
-  
-  this.getStartCursor = function() {
-    return $(this.that).data(this.meta_start_cursor);
-  }
-
-  this.setEndCursor = function() {
-    $(this.that).data(this.meta_end_cursor, $(this.that).caret().end);
-  }
-  
-  this.getEndCursor = function() {
-    return $(this.that).data(this.meta_end_cursor);
-  }
-}
 

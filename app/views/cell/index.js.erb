@@ -7,8 +7,8 @@
         append("<%= raw escape_javascript(highlight_div(edit)) %>");
     <% end %>
     $("input#<%=cell%>").parent().find("div.highlight-pane > div").
-      delay(6000).
-      hide(5000, function() {
+      delay(2000).
+      hide(0, function() {
         $(this).remove();
       });
   <% end %>

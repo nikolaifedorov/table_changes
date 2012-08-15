@@ -5,8 +5,7 @@ class CellController < ApplicationController
     @cell_index = cell_texts.group_by(&:index)
     @cells =  @cell_index.keys
     @updated_at = cell_texts.map(&:updated_at).max
-    @history_time_i = params[:after].to_i
-
+    @history_time_i = params[:after].to_i  
   end
   
   def change
@@ -19,6 +18,5 @@ class CellController < ApplicationController
 
     cell_history = params[:history].merge({cell_text_id: cell_text.id})
     cell_text = CellHistory.create(cell_history)
-
   end
 end

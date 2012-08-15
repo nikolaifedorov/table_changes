@@ -8,11 +8,11 @@
 }
 
 .search-highlight {
-  opacity: 0.50;
-  -moz-opacity: 0.50;
-  -khtml-opacity: 0.50;
-  filter: alpha(opacity=50);
-  background-color: #FF6;
+  opacity: 0.20;
+  -moz-opacity: 0.20;
+  -khtml-opacity: 0.20;
+  filter: alpha(opacity=20);
+  background-color: #66FFE7;
 }
 
 .highlight {
@@ -24,11 +24,8 @@
 }
 
 .text {
- width: 140px;
- min-height: 17px;
+  width: 140px;
+  min-height: 17px;
+  font-family: monospace;
 }
 
-div.text {
-  padding: 4px;
-  overflow: auto;
-}
