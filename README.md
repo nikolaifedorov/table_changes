@@ -27,4 +27,4 @@
 
     $ rails server
 
-9. Open url http://<ip-address>:3000/
+9. Open url http://localhost:3000/
