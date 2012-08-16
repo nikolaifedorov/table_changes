@@ -1,14 +1,14 @@
 development:
-  host: 172.22.2.226
+  host: localhost
   port: 9292
   adapter: 'thin'
   
 test:
-  host: 172.22.2.226
+  host: localhost
   port: 9292
   adapter: 'thin'
 
 production:
-  host: 172.22.2.226
+  host: localhost
   port: 9292
   adapter: 'thin'
