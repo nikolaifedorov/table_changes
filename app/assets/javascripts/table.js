@@ -3,7 +3,33 @@
 
 $(function() {
 
-  setTimeout(updateText, 5000);
+  var faye = new Faye.Client(sFayeUrl);
+  faye.subscribe("/table/edit", function(data) {
+    if (data) {
+      data = $.parseJSON(data);      
+      var letter = 8, top = 6, left_const = 3, height = 14;
+      $("table").attr("data-time", data['data-time']);
+      $.each($.parseJSON(data.data), function(index, rows) {
+        $("input#" + rows['name']).val(rows['text']);
+        $.each(rows['changes'], function(index, change) {
+          var div_element = $("<div class='highlight search-highlight'>");
+          var start_cursor = parseInt(change['start_cursor']);
+          var end_cursor = parseInt(change['end_cursor']); 
+          var d_l = start_cursor * letter + left_const;
+          var d_w = (end_cursor - start_cursor) * letter;       
+          div_element.css('left', d_l + 'px');
+          div_element.css('top', top + 'px');
+          div_element.css('width', d_w + 'px');
+          div_element.css('height', height + 'px');
+          div_element.delay(2000).hide(0, function() { $(this).remove(); });
+          $("input#" + rows['name']).parent().
+            find("div.highlight-pane").append(div_element);
+        });
+      });
+    }
+  });
+
+  //setTimeout(updateText, 5000);
 
   var count_changes = 0;
   var timeout_id_wait_changes; 
@@ -125,6 +151,7 @@ $(function() {
         var letter = 8, top = 6, left_const = 3, height = 14;
         $("table").attr("data-time", data['data-time']);
         $.each(data.data, function(index, rows) {
+          $("input#" + rows['name']).val(rows['text']);
           $.each(rows['changes'], function(index, change) {
             var div_element = $("<div class='highlight search-highlight'>");
             var start_cursor = parseInt(change['start_cursor']);
@@ -142,7 +169,7 @@ $(function() {
         });
       }
     });
-    setTimeout(updateText, 5000);
+    //setTimeout(updateText, 5000);
   }
    
 });

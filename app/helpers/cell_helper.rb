@@ -1,5 +1,15 @@
 module CellHelper
 
+  
+
+  def broadcast(channel, &block)
+    message = { channel: channel, data: capture(&block) }
+    uri = URI.parse("http://#{FAYE_CONFIG['host']}:#{FAYE_CONFIG['port']}/faye")
+    Net::HTTP.post_form(uri, :message => message.to_json)
+  end
+
+
+
   LETTER = 8
 
   def highlight_top()

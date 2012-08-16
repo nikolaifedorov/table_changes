@@ -1,9 +1,11 @@
 <% content_for :head do %>
   <%= stylesheet_link_tag :table %>
+  <%= javascript_include_tag "#{faye_server_name()}/faye/faye.js" %>
   <%= javascript_include_tag 'jquery.caret.1.02' %>
   <%= javascript_include_tag :metadata %>  
   <%= javascript_include_tag :table %>
   <script type="text/javascript">
+    var sFayeUrl = "<%= faye_server_name() + '/faye' %>";
     var sChangesTextAjaxUrl = "<%= cell_change_path %>";
     var sUpdateTextAjaxUrl = "<%= cell_index_path(:js) %>";
     var sUpdateTextJsonUrl = "<%= cell_index_path(:json) %>";
