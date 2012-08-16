@@ -1,63 +1,26 @@
 module CellHelper
 
-  
-
   def broadcast(channel, &block)
     message = { channel: channel, data: capture(&block) }
-    uri = URI.parse("http://#{FAYE_CONFIG['host']}:#{FAYE_CONFIG['port']}/faye")
+    uri = URI.parse("#{faye_server_name}/faye")
     Net::HTTP.post_form(uri, :message => message.to_json)
-  end
-
-
-
-  LETTER = 8
-
-  def highlight_top()
-    6
-  end
-
-  def highlight_left(start_c)
-    (start_c * LETTER) + 3  
-  end
-
-  def highlight_width(start_c, end_c)
-    return (end_c - start_c) * LETTER if (end_c > start_c)
-    0
-  end
-
-  def highlight_height()
-    14
-  end
-
-  def highlight_div(cell_edit)
-    top = highlight_top()
-    left = highlight_left(cell_edit.start)
-    width = highlight_width(cell_edit.start, cell_edit.end)
-    height = highlight_height()
-    "<div class='highlight search-highlight' " +
-    "style='left: #{left}px; top: #{top}px; width: #{width}px; height: #{height}px;'></div>"
-  end
-
-  def get_text_by_index(group, index)
-    group[index][0].text
-  end
-
-  def get_text_histories(group, index, time_i)
-    group[index][0].cell_histories.
-      where("created_at > ?", Time.at(time_i + 1))
   end
 
   def changes_json(name_cells, cells_index, date_i)
     data_json = []
     name_cells.each do |name_cell| 
       cell = {}
-      cell[:text] = get_text_by_index(cells_index, name_cell)
-      cell[:changes] = [] 
-      get_text_histories(cells_index, name_cell, date_i).each do |edit|
+      cell[:text] = cells_index[name_cell][0].text
+      cell[:changes] = []
+      histories = cells_index[name_cell][0].cell_histories.
+                    where("created_at > ?", Time.at(date_i + 1)) 
+      histories.each do |edit|
         change = {}        
-        change[:start_cursor] = edit.start
-        change[:end_cursor] = edit.end
-        cell[:changes] << change
+        if (edit.start < edit.end)          
+          change[:start_cursor] = edit.start
+          change[:end_cursor] = edit.end
+          cell[:changes] << change
+        end
       end
       cell[:changes].to_json
       cell[:name] = name_cell

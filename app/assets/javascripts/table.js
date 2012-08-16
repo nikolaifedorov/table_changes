@@ -7,30 +7,40 @@ $(function() {
   faye.subscribe("/table/edit", function(data) {
     if (data) {
       data = $.parseJSON(data);      
-      var letter = 8, top = 6, left_const = 3, height = 14;
+      var letter = 8, height = 14;
       $("table").attr("data-time", data['data-time']);
       $.each($.parseJSON(data.data), function(index, rows) {
         $("input#" + rows['name']).val(rows['text']);
         $.each(rows['changes'], function(index, change) {
+          var input_elem = $("input#" + rows['name']);
+          var margin = input_elem.margin()
+          var padding = input_elem.padding()
+          var border = input_elem.border();
+          var top = border.top + margin.top + padding.top;
+          var left = margin.left + padding.left + border.left;
+          
+          var td_elem = $(input_elem).parent();
+          padding = td_elem.padding()
+          top = top + padding.top;
+          left = left + padding.left;
+
           var div_element = $("<div class='highlight search-highlight'>");
           var start_cursor = parseInt(change['start_cursor']);
           var end_cursor = parseInt(change['end_cursor']); 
-          var d_l = start_cursor * letter + left_const;
+          var d_l = (start_cursor * letter) + left;
           var d_w = (end_cursor - start_cursor) * letter;       
           div_element.css('left', d_l + 'px');
           div_element.css('top', top + 'px');
           div_element.css('width', d_w + 'px');
           div_element.css('height', height + 'px');
           div_element.delay(2000).hide(0, function() { $(this).remove(); });
-          $("input#" + rows['name']).parent().
+          $(input_elem).parent().
             find("div.highlight-pane").append(div_element);
         });
       });
     }
   });
-
-  //setTimeout(updateText, 5000);
-
+  
   var count_changes = 0;
   var timeout_id_wait_changes; 
 
@@ -141,35 +151,6 @@ $(function() {
       });
     }
     metaData.setStartCursor();
-  }
-
-  function updateText () {
-    var after = $("table").attr("data-time");
-    //$.getScript(sUpdateTextAjaxUrl +"?after=" + after);
-    $.getJSON(sUpdateTextJsonUrl, "after=" + after, function(data) {
-      if (data) {      
-        var letter = 8, top = 6, left_const = 3, height = 14;
-        $("table").attr("data-time", data['data-time']);
-        $.each(data.data, function(index, rows) {
-          $("input#" + rows['name']).val(rows['text']);
-          $.each(rows['changes'], function(index, change) {
-            var div_element = $("<div class='highlight search-highlight'>");
-            var start_cursor = parseInt(change['start_cursor']);
-            var end_cursor = parseInt(change['end_cursor']); 
-            var d_l = start_cursor * letter + left_const;
-            var d_w = (end_cursor - start_cursor) * letter;       
-            div_element.css('left', d_l + 'px');
-            div_element.css('top', top + 'px');
-            div_element.css('width', d_w + 'px');
-            div_element.css('height', height + 'px');
-            div_element.delay(2000).hide(0, function() { $(this).remove(); });
-            $("input#" + rows['name']).parent().
-              find("div.highlight-pane").append(div_element);
-          });
-        });
-      }
-    });
-    //setTimeout(updateText, 5000);
   }
    
 });

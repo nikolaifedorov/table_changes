@@ -3,6 +3,10 @@
   They will automatically be included in application.css.
 */
 
+table {
+  margin: 0 auto;
+}
+
 .highlight-pane {
   position: relative;
 }
@@ -27,5 +31,6 @@
   width: 140px;
   min-height: 17px;
   font-family: monospace;
+  font-size: 14px;
 }
 
