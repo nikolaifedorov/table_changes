@@ -6,14 +6,14 @@ module CellHelper
     Net::HTTP.post_form(uri, :message => message.to_json)
   end
 
+
   def changes_json(name_cells, cells_index, date_i)
     data_json = []
     name_cells.each do |name_cell| 
       cell = {}
       cell[:text] = cells_index[name_cell][0].text
       cell[:changes] = []
-      histories = cells_index[name_cell][0].cell_histories.
-                    where("created_at > ?", Time.at(date_i + 1)) 
+      histories = cells_index[name_cell][0].cell_histories.later_created_at(date_i)
       histories.each do |edit|
         change = {}        
         if (edit.start < edit.end)          
@@ -28,4 +28,5 @@ module CellHelper
     end
     data_json.to_json
   end
+
 end

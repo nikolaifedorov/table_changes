@@ -8,10 +8,10 @@ class CellController < ApplicationController
     cell_text.text = text
     cell_text.save!
 
-    cell_history = params[:history].merge({cell_text_id: cell_text.id})
+    cell_history = params[:history].merge({ cell_text_id: cell_text.id })
     cell_text = CellHistory.create!(cell_history)
-
-    cell_texts = CellText.where("updated_at > ?", Time.at(params[:syn].to_i + 1))
+  
+    cell_texts = CellText.later_updated_at(params[:syn].to_i)
     @cell_index = cell_texts.group_by(&:index)
     @cells =  @cell_index.keys
     @updated_at = cell_texts.map(&:updated_at).max

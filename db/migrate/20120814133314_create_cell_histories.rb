@@ -4,7 +4,6 @@ class CreateCellHistories < ActiveRecord::Migration
     create_table :cell_histories do |t|
       t.integer :start
       t.integer :end
-      t.string :text
       t.references :cell_text
       t.timestamps
     end
@@ -20,7 +19,7 @@ class CreateCellHistories < ActiveRecord::Migration
   def down
     execute <<-SQL
       ALTER TABLE cell_histories
-        DROP FOREIGN KEY fk_products_cell_texts
+        DROP CONSTRAINT fk_cell_histories_cell_texts
     SQL
     drop_table :cell_histories
   end

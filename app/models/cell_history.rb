@@ -3,4 +3,8 @@ class CellHistory < ActiveRecord::Base
 
   belongs_to :cell_text
 
+  scope :later_created_at, lambda { |date_i|
+      where("created_at > ?", Time.at(date_i + 1)) 
+  }
+
 end

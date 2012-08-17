@@ -36,7 +36,6 @@ CREATE TABLE cell_histories (
     id integer NOT NULL,
     start integer,
     "end" integer,
-    text character varying(255),
     cell_text_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL

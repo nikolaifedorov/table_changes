@@ -1,5 +1,3 @@
-// Place all the behaviors and hooks related to the matching controller here.
-// All this logic will automatically be available in application.js.
 
 $(function() {
 
@@ -10,40 +8,54 @@ $(function() {
       var letter = 8, height = 14;
       $("table").attr("data-time", data['data-time']);
       $.each($.parseJSON(data.data), function(index, rows) {
-        $("input#" + rows['name']).val(rows['text']);
-        $.each(rows['changes'], function(index, change) {
-          var input_elem = $("input#" + rows['name']);
-          var margin = input_elem.margin()
-          var padding = input_elem.padding()
-          var border = input_elem.border();
-          var top = border.top + margin.top + padding.top;
-          var left = margin.left + padding.left + border.left;
-          
-          var td_elem = $(input_elem).parent();
-          padding = td_elem.padding()
-          top = top + padding.top;
-          left = left + padding.left;
 
-          var div_element = $("<div class='highlight search-highlight'>");
-          var start_cursor = parseInt(change['start_cursor']);
-          var end_cursor = parseInt(change['end_cursor']); 
-          var d_l = (start_cursor * letter) + left;
-          var d_w = (end_cursor - start_cursor) * letter;       
-          div_element.css('left', d_l + 'px');
-          div_element.css('top', top + 'px');
-          div_element.css('width', d_w + 'px');
-          div_element.css('height', height + 'px');
-          div_element.delay(2000).hide(0, function() { $(this).remove(); });
-          $(input_elem).parent().
-            find("div.highlight-pane").append(div_element);
-        });
+        var input_elem = $("input#" + rows['name']);
+        var metaData = new MetaData(input_elem);
+        metaData.setOldText();        
+        if (metaData.getNewText() != rows['text']) { 
+          $(input_elem).val(rows['text']);
+          metaData.setNewText();
+          metaData.setStartCursor();  
+
+          $.each(rows['changes'], function(index, change) {
+            // Calculate indent from left and top.          
+            // indent for input field (input - html element)          
+            var margin = input_elem.margin()
+            var padding = input_elem.padding()
+            var border = input_elem.border();
+            var top = border.top + margin.top + padding.top;
+            var left = margin.left + padding.left + border.left;
+            // indent for cell (td - html element)          
+            var td_elem = $(input_elem).parent();
+            padding = td_elem.padding()
+            top = top + padding.top;
+            left = left + padding.left;
+            // create highlight
+            var div_element = $("<div class='highlight edit-highlight'>");
+            var start_cursor = parseInt(change['start_cursor']);
+            var end_cursor = parseInt(change['end_cursor']); 
+            var d_l = (start_cursor * letter) + left;
+            var d_w = (end_cursor - start_cursor) * letter;       
+            div_element.css('left', d_l + 'px');
+            div_element.css('top', top + 'px');
+            div_element.css('width', d_w + 'px');
+            div_element.css('height', height + 'px');
+            div_element.delay(2000).hide(0, function() { $(this).remove(); });
+            $(input_elem).parent().
+              find("div.highlight-pane").append(div_element);
+          });
+        }
+
       });
     }
   });
   
+  // Number the user changes, which we should send.
+  var block_changes_for_send = 3;
+  // count for user changes.
   var count_changes = 0;
+  // store last timer id.  
   var timeout_id_wait_changes; 
-
 
   $("#container td input.text").live({
   
@@ -54,11 +66,11 @@ $(function() {
 
       $(that).parent().find('div.highlight-pane > div').remove();
 
-      cancelTimer();
-      timeout_id_wait_changes = setTimeout(function() { changesText(that); }, 500);
+      var is_text_change = (metaData.getNewText() != metaData.getOldText());
 
-      if(metaData.getNewText() == metaData.getOldText()) {
-        cancelTimer();  
+      cancelTimer();
+      if(metaData.getNewText() != metaData.getOldText()) {
+        timeout_id_wait_changes = setTimeout(function() { changesText(that); }, 500);
       }
 
       var code = event.keyCode ? event.keyCode : event.charCode;
@@ -66,25 +78,19 @@ $(function() {
       var del_code = [8, 46];
       var arrow_code = [37, 38, 39, 40];
 
-      if ($.inArray(code, $.merge(del_code, arrow_code)) > -1 )  {
+      if (($.inArray(code, $.merge(del_code, arrow_code)) > -1) && !is_text_change)  {
         metaData.setStartCursor();
         metaData.setEndCursor();
       }
 
-      var text = $(that).val();
-      var s = $(that).caret().end;
-
-      var beforeCaret = text.substring(0, s).replace(/ /g, '\xa0') || '\xa0';
-      var afterCaret = text.substring(s).replace(/ /g, '\xa0') || '\xa0';
-
       if ($.inArray(code, arrow_code) == -1) {
         metaData.setEndCursor();
 
-        if(metaData.getNewText() != metaData.getOldText()) {
+        if(is_text_change) {
           count_changes = count_changes + 1;
         }
 
-        if (count_changes >= 3) {
+        if (count_changes >= block_changes_for_send) {
           changesText(that);
         }
       } 
@@ -118,6 +124,12 @@ $(function() {
     },
 
     mouseup: function() {
+      var that = this;
+      var metaData = new MetaData(that);
+      metaData.setStartCursor();
+    },
+
+    mouseleave: function() {
       var that = this;
       var metaData = new MetaData(that);
       metaData.setStartCursor();

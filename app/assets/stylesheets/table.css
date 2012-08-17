@@ -11,7 +11,7 @@ table {
   position: relative;
 }
 
-.search-highlight {
+.edit-highlight {
   opacity: 0.20;
   -moz-opacity: 0.20;
   -khtml-opacity: 0.20;
