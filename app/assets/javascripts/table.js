@@ -15,7 +15,8 @@ $(function() {
         if (metaData.getNewText() != rows['text']) { 
           $(input_elem).val(rows['text']);
           metaData.setNewText();
-          metaData.setStartCursor();  
+          metaData.setStartCursor();
+          $(input_elem).parent().find('div.highlight-pane > div').remove();  
 
           $.each(rows['changes'], function(index, change) {
             // Calculate indent from left and top.          
@@ -78,9 +79,17 @@ $(function() {
       var del_code = [8, 46];
       var arrow_code = [37, 38, 39, 40];
 
+      // if text do not change but user presses the key.
       if (($.inArray(code, $.merge(del_code, arrow_code)) > -1) && !is_text_change)  {
         metaData.setStartCursor();
         metaData.setEndCursor();
+      }
+
+      // change (next) arrow
+      if ($.inArray(code, arrow_code) > -1) {
+        if(is_text_change) {
+          changesText(that);
+        }
       }
 
       if ($.inArray(code, arrow_code) == -1) {
